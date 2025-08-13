@@ -57,8 +57,10 @@ export const Navbar = () => {
             )}
             
             <div className="relative">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium">
-                Get Online Shop Website + POS
+              <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-medium">
+                <Link to="/list-&-get-pos-website">
+                  Get Online Shop Website + POS
+                </Link>
               </Button>
               <Badge className="absolute -top-1 -right-1 bg-yellow-400 text-black text-xs px-2 py-0">
                 New
