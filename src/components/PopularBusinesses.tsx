@@ -209,12 +209,12 @@ const PopularBusinesses = () => {
         
         <div className="flex flex-wrap justify-center">
           {businesses.map((business) => (
-            <Card key={business.id} className="w-[320px] h-[455px] flex flex-col shadow-lg mx-[5px] md:mx-[10px] mb-4">
+            <Card key={business.id} className="w-[320px] h-[455px] flex flex-col shadow-lg hover:shadow-2xl transition-all duration-300 mx-[5px] md:mx-[10px] mb-4">
               <div className="relative overflow-hidden rounded-t-lg">
                 <img
                   src={business.image}
                   alt={business.name}
-                  className="w-[320px] h-[220px] object-cover"
+                  className="w-[320px] h-[220px] object-cover transition-transform duration-300 hover:scale-105"
                 />
                 <Button
                   variant="ghost"
