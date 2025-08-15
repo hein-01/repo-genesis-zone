@@ -264,7 +264,7 @@ const Index = () => {
                 className="w-full h-[35px] object-cover"
               />
               <div className="absolute inset-0 flex items-center justify-center text-white">
-                <h3 className="text-sm font-semibold">See All Products</h3>
+                <h3 className="text-sm font-semibold underline">Find Your Product</h3>
               </div>
             </a>
           </div>
