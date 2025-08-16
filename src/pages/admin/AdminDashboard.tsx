@@ -1,15 +1,30 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import TwoFactorSetup from "@/components/admin/TwoFactorSetup";
-import { Shield, Users, Settings, LogOut, Crown } from "lucide-react";
+import AdminMetrics from "@/components/admin/AdminMetrics";
+import RecentActivity from "@/components/admin/RecentActivity";
+import ListingManagement from "@/components/admin/ListingManagement";
+import { 
+  Shield, 
+  Users, 
+  Settings, 
+  LogOut, 
+  Crown, 
+  BarChart3,
+  FileText,
+  Store,
+  Home
+} from "lucide-react";
 
 export default function AdminDashboard() {
   const { adminProfile, loading, signOut, isAuthenticated } = useAdminAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'overview' | 'listings' | 'users' | 'settings'>('overview');
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -55,6 +70,13 @@ export default function AdminDashboard() {
     }
   };
 
+  const navItems = [
+    { key: 'overview', label: 'Overview', icon: Home },
+    { key: 'listings', label: 'Listings', icon: Store },
+    { key: 'users', label: 'Users', icon: Users },
+    { key: 'settings', label: 'Settings', icon: Settings },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -68,91 +90,129 @@ export default function AdminDashboard() {
                 <p className="text-muted-foreground">WellFinds Administration</p>
               </div>
             </div>
-            <Button variant="outline" onClick={signOut} className="flex items-center space-x-2">
-              <LogOut className="h-4 w-4" />
-              <span>Sign Out</span>
-            </Button>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                {getRoleIcon()}
+                <span className="text-sm font-medium">{getRoleDisplayName()}</span>
+                <Badge variant={adminProfile?.two_factor_enabled ? "default" : "destructive"}>
+                  {adminProfile?.two_factor_enabled ? "2FA On" : "2FA Off"}
+                </Badge>
+              </div>
+              <Button variant="outline" onClick={signOut} className="flex items-center space-x-2">
+                <LogOut className="h-4 w-4" />
+                <span>Sign Out</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Profile Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                {getRoleIcon()}
-                <span>Admin Profile</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Role</p>
-                <p className="font-medium">{getRoleDisplayName()}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">User ID</p>
-                <p className="font-mono text-xs">{adminProfile?.user_id}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Two-Factor Authentication</p>
-                <p className={`font-medium ${adminProfile?.two_factor_enabled ? 'text-green-600' : 'text-red-600'}`}>
-                  {adminProfile?.two_factor_enabled ? 'Enabled' : 'Disabled'}
-                </p>
-              </div>
-              {adminProfile?.last_login_at && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Last Login</p>
-                  <p className="text-sm">{new Date(adminProfile.last_login_at).toLocaleString()}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Two-Factor Authentication */}
-          <div className="md:col-span-2">
-            <TwoFactorSetup />
+      {/* Navigation */}
+      <nav className="border-b bg-card">
+        <div className="container mx-auto px-4">
+          <div className="flex space-x-8">
+            {navItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <button
+                  key={item.key}
+                  onClick={() => setActiveTab(item.key as any)}
+                  className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
+                    activeTab === item.key
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <IconComponent className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
+      </nav>
 
-        <Separator className="my-8" />
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {activeTab === 'overview' && (
+          <div className="space-y-8">
+            {/* Metrics Section */}
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Dashboard Overview</h2>
+              <AdminMetrics />
+            </div>
 
-        {/* Admin Actions */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-            <CardContent className="p-6 text-center">
-              <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
-              <h3 className="font-semibold">User Management</h3>
-              <p className="text-sm text-muted-foreground">Manage user accounts</p>
-            </CardContent>
-          </Card>
+            <Separator />
 
-          <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-            <CardContent className="p-6 text-center">
-              <Shield className="h-8 w-8 mx-auto mb-2 text-primary" />
-              <h3 className="font-semibold">Security</h3>
-              <p className="text-sm text-muted-foreground">Security settings</p>
-            </CardContent>
-          </Card>
+            {/* Recent Activity */}
+            <div>
+              <h2 className="text-2xl font-bold mb-6">Recent Activity</h2>
+              <RecentActivity />
+            </div>
+          </div>
+        )}
 
-          <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-            <CardContent className="p-6 text-center">
-              <Settings className="h-8 w-8 mx-auto mb-2 text-primary" />
-              <h3 className="font-semibold">System Settings</h3>
-              <p className="text-sm text-muted-foreground">Configure system</p>
-            </CardContent>
-          </Card>
+        {activeTab === 'listings' && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Listing Management</h2>
+            <ListingManagement />
+          </div>
+        )}
 
-          <Card className="cursor-pointer hover:bg-muted/50 transition-colors">
-            <CardContent className="p-6 text-center">
-              <Crown className="h-8 w-8 mx-auto mb-2 text-primary" />
-              <h3 className="font-semibold">Reports</h3>
-              <p className="text-sm text-muted-foreground">View analytics</p>
-            </CardContent>
-          </Card>
-        </div>
+        {activeTab === 'users' && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">User Management</h2>
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Users className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-semibold mb-2">User Management</h3>
+                <p className="text-muted-foreground">User management features coming soon...</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeTab === 'settings' && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Admin Settings</h2>
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Profile Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    {getRoleIcon()}
+                    <span>Admin Profile</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Role</p>
+                    <p className="font-medium">{getRoleDisplayName()}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">User ID</p>
+                    <p className="font-mono text-xs">{adminProfile?.user_id}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Two-Factor Authentication</p>
+                    <p className={`font-medium ${adminProfile?.two_factor_enabled ? 'text-green-600' : 'text-red-600'}`}>
+                      {adminProfile?.two_factor_enabled ? 'Enabled' : 'Disabled'}
+                    </p>
+                  </div>
+                  {adminProfile?.last_login_at && (
+                    <div>
+                      <p className="text-sm text-muted-foreground">Last Login</p>
+                      <p className="text-sm">{new Date(adminProfile.last_login_at).toLocaleString()}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Two-Factor Authentication */}
+              <TwoFactorSetup />
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
