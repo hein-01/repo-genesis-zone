@@ -32,14 +32,24 @@ export default function AdminAuthForm() {
       
       const redirectUrl = `${window.location.origin}/admin/callback`;
       
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectUrl
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: false,
+          queryParams: {
+            admin_access: 'true'
+          }
         }
       });
 
       if (error) throw error;
+
+      // If data.url is provided, manually redirect to ensure proper callback
+      if (data?.url) {
+        window.location.href = data.url;
+        return;
+      }
     } catch (error: any) {
       console.error("Google auth error:", error);
       toast({
