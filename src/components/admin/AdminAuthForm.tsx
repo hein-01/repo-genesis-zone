@@ -223,6 +223,13 @@ export default function AdminAuthForm() {
             </Button>
           </CardContent>
         </Card>
+        
+        <div className="text-center text-sm text-muted-foreground">
+          Need admin access?{" "}
+          <a href="/admin/signup" className="text-primary hover:underline">
+            Register here
+          </a>
+        </div>
       </div>
     </div>
   );
