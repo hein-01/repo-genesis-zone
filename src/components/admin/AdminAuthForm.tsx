@@ -51,16 +51,36 @@ export default function AdminAuthForm() {
       if (error) throw error;
 
       // Check if user is admin
-      const { data: adminUser, error: adminError } = await supabase
+      // Check if user is admin; provision if allowed and missing
+      let { data: adminUser, error: adminError } = await supabase
         .from('admin_users')
         .select('*')
         .eq('user_id', data.user.id)
-        .single();
+        .maybeSingle();
 
       if (adminError || !adminUser) {
-        // Sign out if not admin
-        await supabase.auth.signOut();
-        throw new Error("Access denied. Admin privileges required.");
+        // Try to provision admin access for allowed emails
+        const { data: provisionResult, error: provisionError } = await supabase.rpc('provision_admin_user', {
+          user_email: formData.email,
+          admin_role_input: 'admin'
+        });
+
+        if (provisionError) {
+          await supabase.auth.signOut();
+          throw new Error(provisionError.message || "Access denied. Admin privileges required.");
+        }
+
+        // Re-check admin profile after provisioning
+        const { data: adminUserAfter, error: adminErrorAfter } = await supabase
+          .from('admin_users')
+          .select('*')
+          .eq('user_id', data.user.id)
+          .maybeSingle();
+
+        if (adminErrorAfter || !adminUserAfter) {
+          await supabase.auth.signOut();
+          throw new Error("Access denied. Admin privileges required.");
+        }
       }
 
       toast({
