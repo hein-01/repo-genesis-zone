@@ -14,13 +14,234 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_users: {
+        Row: {
+          admin_role: string | null
+          created_at: string
+          id: string
+          two_factor_enabled: boolean | null
+          two_factor_secret: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_role?: string | null
+          created_at?: string
+          id?: string
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_role?: string | null
+          created_at?: string
+          id?: string
+          two_factor_enabled?: boolean | null
+          two_factor_secret?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      business_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      business_reviews: {
+        Row: {
+          business_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          address: string | null
+          category: string | null
+          city: string | null
+          created_at: string
+          description: string | null
+          email: string | null
+          id: string
+          image_url: string | null
+          name: string
+          owner_id: string
+          phone: string | null
+          rating: number | null
+          state: string | null
+          updated_at: string
+          website: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          owner_id: string
+          phone?: string | null
+          rating?: number | null
+          state?: string | null
+          updated_at?: string
+          website?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          rating?: number | null
+          state?: string | null
+          updated_at?: string
+          website?: string | null
+          zip_code?: string | null
+        }
+        Relationships: []
+      }
+      login_attempts: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          success: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          role: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_admin_rate_limit: {
+        Args: { user_email: string }
+        Returns: boolean
+      }
+      check_rate_limit: {
+        Args: { user_email: string }
+        Returns: boolean
+      }
+      log_admin_login_attempt: {
+        Args: { attempt_success: boolean; user_email: string }
+        Returns: undefined
+      }
+      log_login_attempt: {
+        Args: { attempt_success: boolean; user_email: string }
+        Returns: undefined
+      }
+      provision_admin_user: {
+        Args: { user_email: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
